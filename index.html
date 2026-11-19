@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Спільні інтереси</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #eef2ff;
+    margin: 0;
+    padding: 30px;
+    color: #24304a;
+}
+
+.container {
+    max-width: 850px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px #0002;
+}
+
+h1 {
+    text-align: center;
+    color: #4263eb;
+}
+
+.description {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.groups {
+    display: flex;
+    gap: 20px;
+}
+
+.group {
+    flex: 1;
+}
+
+textarea {
+    width: 100%;
+    height: 120px;
+    padding: 12px;
+    border: 2px solid #dce2ef;
+    border-radius: 10px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: #4263eb;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background: #304ac0;
+}
+
+.buttons {
+    text-align: center;
+    margin: 25px 0;
+}
+
+.result {
+    background: #f3f5ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+
+.result h3 {
+    color: #4263eb;
+}
+
+li {
+    margin: 8px 0;
+}
+
+@media(max-width:600px) {
+    .groups {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🤝 Спільні інтереси</h1>
+
+<p class="description">
+Дізнаймося, що об'єднує дві навчальні групи!
+</p>
+
+<div class="groups">
+
+    <div class="group">
+        <h3>🔵 Група №1</h3>
+        <textarea id="groupA">код, музика, спорт, ігри</textarea>
+    </div>
+
+    <div class="group">
+        <h3>🟣 Група №2</h3>
+        <textarea id="groupB">спорт, код, малювання, читання</textarea>
+    </div>
+
+</div>
+
+<div class="buttons">
+    <button onclick="compare()">Знайти спільне</button>
+    <button onclick="example1()">Приклад 1</button>
+    <button onclick="example2()">Приклад 2</button>
+    <button onclick="resetAll()">Очистити</button>
+</div>
+
+<div class="result">
+
+    <h2>📊 Результат порівняння</h2>
+
+    <h3>🤝 Спільні інтереси:</h3>
+    <ul id="common"></ul>
+
+    <h3>🌟 Усі інтереси:</h3>
+    <ul id="all"></ul>
+
+    <h3>🔵 Тільки в групі №1:</h3>
+    <ul id="onlyA"></ul>
+
+    <h3>🟣 Тільки в групі №2:</h3>
+    <ul id="onlyB"></ul>
+
+    <h3 id="count">Кількість спільних інтересів: 0</h3>
+
+    <p id="message"></p>
+
+</div>
+
+<h3>📌 Обмеження програми</h3>
+
+<ul>
+    <li>Інтереси вводяться через кому.</li>
+    <li>Повторення автоматично видаляються.</li>
+    <li>Великі та малі літери можуть вважатися різними.</li>
+    <li>Результати сортуються за алфавітом.</li>
+</ul>
+
+</div>
+
+<script>
+
+function compareInterests(a, b) {
+
+    let setA = new Set(a);
+    let setB = new Set(b);
+
+    let common = [...setA].filter(x => setB.has(x));
+
+    let all = [...new Set([...setA, ...setB])];
+
+    let onlyA = [...setA].filter(x => !setB.has(x));
+
+    let onlyB = [...setB].filter(x => !setA.has(x));
+
+    return {
+        common: common.sort(),
+        all: all.sort(),
+        onlyA: onlyA.sort(),
+        onlyB: onlyB.sort()
+    };
+}
+
+function parseList(id) {
+    return document.getElementById(id)
+        .value
+        .split(/[,\n;]+/)
+        .map(x => x.trim())
+        .filter(x => x !== "");
+}
+
+function showList(id, items) {
+
+    let list = document.getElementById(id);
+
+    list.innerHTML = "";
+
+    if (items.length === 0) {
+        list.innerHTML = "<li>Немає</li>";
+        return;
+    }
+
+    items.forEach(item => {
+        let li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+    });
+}
+
+function compare() {
+
+    let a = parseList("groupA");
+    let b = parseList("groupB");
+
+    let result = compareInterests(a, b);
+
+    showList("common", result.common);
+    showList("all", result.all);
+    showList("onlyA", result.onlyA);
+    showList("onlyB", result.onlyB);
+
+    document.getElementById("count").textContent =
+        "Кількість спільних інтересів: " +
+        result.common.length;
+
+    document.getElementById("message").textContent =
+        result.common.length > 0
+        ? "🎉 Чудово! Групи мають спільні інтереси!"
+        : "Спільних інтересів немає. Спробуйте ще раз!";
+}
+
+function example1() {
+
+    document.getElementById("groupA").value =
+        "код, музика, спорт, ігри";
+
+    document.getElementById("groupB").value =
+        "спорт, код, малювання, читання";
+
+    compare();
+}
+
+function example2() {
+
+    document.getElementById("groupA").value =
+        "футбол, танці, малювання";
+
+    document.getElementById("groupB").value =
+        "програмування, музика, читання";
+
+    compare();
+}
+
+function resetAll() {
+
+    document.getElementById("groupA").value = "";
+    document.getElementById("groupB").value = "";
+
+    ["common", "all", "onlyA", "onlyB"].forEach(id => {
+        document.getElementById(id).innerHTML = "";
+    });
+
+    document.getElementById("count").textContent =
+        "Кількість спільних інтересів: 0";
+
+    document.getElementById("message").textContent = "";
+}
+
+compare();
+
+</script>
+
+</body>
+</html>
